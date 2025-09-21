@@ -32,7 +32,9 @@ app = FastAPI(title="Stripe Digital Delivery")
 # Simple in-memory idempotency (replace with Redis/DB in prod)
 SEEN_EVENTS = set()
 
-
+@app.get("/")
+def health():
+    return {"ok": True, "service": "Stripe Digital Delivery"}
 
 def _first_nonempty(*vals):
     for v in vals:
@@ -112,10 +114,6 @@ def format_email_body(customer_email: str, deliverables):
       <p style="margin-top:24px;color:#666">{BRAND_FOOTER}</p>
     </div>
     """
-    
-@app.get("/")
-def health():
-    return {"ok": True, "service": "Stripe Digital Delivery"}
 
 @app.post("/stripe/webhook")
 async def stripe_webhook(request: Request):
