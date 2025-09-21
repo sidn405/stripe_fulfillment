@@ -1,0 +1,12 @@
+# Minimal Railway service config
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+startCommand = "uvicorn app:app --host 0.0.0.0 --port ${PORT}"
+restartPolicyType = "ON_FAILURE"     # or ALWAYS
+healthcheckPath = "/"                # our app has GET "/"
+healthcheckTimeout = 300
+
+[service]
+name = "stripe-fulfillment"
