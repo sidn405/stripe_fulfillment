@@ -5,7 +5,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    PORT=8000
+    PORT=8080
 
 # System deps (add 'build-essential' only if a lib needs compiling)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -26,8 +26,8 @@ COPY . /app
 RUN useradd -m appuser
 USER appuser
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Start FastAPI via uvicorn; Railway sets $PORT
-ENV PORT=8000
-CMD ["sh","-c","uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000} --log-level info"]
+ENV PORT=8080
+CMD ["sh","-c","uvicorn app:app --host 0.0.0.0 --port ${PORT:-8080} --log-level info"]
