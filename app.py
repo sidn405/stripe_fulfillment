@@ -14,14 +14,14 @@ import os, logging
 load_dotenv()
 
 # --- Config ---
-STRIPE_API_KEY = os.getenv("STRIPE_API_KEY", "")                 # safe
+STRIPE_SECRET_KEY = os.getenv("STRIPE_API_KEY", "")                 # safe
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")   # safe
 APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000")
 
 DELIVERY_FROM_NAME = os.environ.get("DELIVERY_FROM_NAME", "Your Store")
 BRAND_FOOTER = os.environ.get("BRAND_FOOTER", "Thanks for your purchase!")
 
-stripe.api_key = STRIPE_API_KEY or None  # ok if None at boot
+stripe.api_key = STRIPE_SECRET_KEY or None  # ok if None at boot
 
 
 logging.basicConfig(level=logging.INFO)
