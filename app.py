@@ -9,19 +9,20 @@ from discord_notification_system import send_discord_notification
 from products_config import PRODUCTS, ATTACHMENT_SIZE_LIMIT
 from token_links import make_signed_link, verify_token
 from notifier import send_fulfillment_card
-
+import os, logging
 
 load_dotenv()
 
 # --- Config ---
-STRIPE_API_KEY = os.environ["STRIPE_API_KEY"]                 # test or live
-STRIPE_WEBHOOK_SECRET = os.environ["STRIPE_WEBHOOK_SECRET"]   # from `stripe listen`
-APP_BASE_URL = os.environ.get("APP_BASE_URL", "http://localhost:8000")
+STRIPE_API_KEY = os.getenv("STRIPE_API_KEY", "")                 # safe
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")   # safe
+APP_BASE_URL = os.getenv("APP_BASE_URL", "http://localhost:8000")
 
 DELIVERY_FROM_NAME = os.environ.get("DELIVERY_FROM_NAME", "Your Store")
 BRAND_FOOTER = os.environ.get("BRAND_FOOTER", "Thanks for your purchase!")
 
-stripe.api_key = STRIPE_API_KEY
+stripe.api_key = STRIPE_API_KEY or None  # ok if None at boot
+
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("stripe-fulfillment")
@@ -30,6 +31,8 @@ app = FastAPI(title="Stripe Digital Delivery")
 
 # Simple in-memory idempotency (replace with Redis/DB in prod)
 SEEN_EVENTS = set()
+
+
 
 def _first_nonempty(*vals):
     for v in vals:
@@ -109,6 +112,10 @@ def format_email_body(customer_email: str, deliverables):
       <p style="margin-top:24px;color:#666">{BRAND_FOOTER}</p>
     </div>
     """
+    
+@app.get("/")
+def health():
+    return {"ok": True, "service": "Stripe Digital Delivery"}
 
 @app.post("/stripe/webhook")
 async def stripe_webhook(request: Request):
