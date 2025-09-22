@@ -20,10 +20,14 @@ def _get_webhook_url(kind: str) -> Optional[str]:
     return m.get(kind)
 
 def _post_direct(webhook_url: str, title: str, description: str, fields: List[Dict], color: int) -> bool:
+    import logging
+    log = logging.getLogger("notifier")
     if not webhook_url:
         return False
     payload = {"embeds": [{"title": title, "description": description, "fields": fields, "color": color}]}
     r = requests.post(webhook_url, json=payload, timeout=10)
+    if not r.ok:
+        log.error("Discord POST failed status=%s body=%s", r.status_code, r.text[:200])
     return r.ok
 
 def _send_any(webhook_type: str, title: str, description: str, fields: List[Dict], color: int) -> bool:
