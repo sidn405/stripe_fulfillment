@@ -232,6 +232,7 @@ async def stripe_webhook(request: Request):
                     order_id=obj.get("id") or obj.get("payment_intent"),
                     mode="customer"   # posts to WEBHOOK_CUSTOMER
                 )
+                log.info("Discord fulfillment sent=%s items=%d", ok, len(deliverables))
                 if not ok:
                     log.error("Discord notification failed")
         except Exception as e:
