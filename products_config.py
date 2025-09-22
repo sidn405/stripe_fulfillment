@@ -8,7 +8,17 @@ PRODUCTS = {
         "name": "5,000 Fitness Leads ($897)",
         "url": "https://drive.google.com/file/d/155XlcLR3taTKY8sekHGCvOFv33HfyrmC/view?usp=drive_link"
     },
+    # add the exact Price ID Stripe shows you:
+    "price_1S9EZ5QIY3HkFeeoDGjQrPVO": {
+        "name": "5,000 Fitness Leads ($897)",
+        "url": "https://drive.google.com/file/d/155XlcLR3taTKY8sekHGCvOFv33HfyrmC/view?usp=drive_link"
+    },
     "prod_T5PX9bhtOQwV9c": {
+        "name": "2,000 Fitness Leads ($297)",
+        "url": "https://drive.google.com/file/d/1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR/view?usp=drive_link"
+    },
+    # add the exact Price ID Stripe shows you:
+    "price_1S9Ei2QIY3HkFeeovCq24aWs": {
         "name": "2,000 Fitness Leads ($297)",
         "url": "https://drive.google.com/file/d/1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR/view?usp=drive_link"
     },
@@ -16,6 +26,12 @@ PRODUCTS = {
         "name": "500 Fitness Leads ($97)",
         "url": "https://drive.google.com/file/d/1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S/view?usp=drive_link"
     },
+    # add the exact Price ID Stripe shows you:
+    "price_1S9EkBQIY3HkFeeoB0OMwMCc": {
+        "name": "500 Fitness Leads ($97)",
+        "url": "https://drive.google.com/file/d/1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S/view?usp=drive_link"
+    },
+
 }
 
 ATTACHMENT_SIZE_LIMIT = 18 * 1024 * 1024  # 18MB
