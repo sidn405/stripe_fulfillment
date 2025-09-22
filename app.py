@@ -48,6 +48,15 @@ def debug_env():
         "chosen": "WEBHOOK_CUSTOMER" if os.getenv("WEBHOOK_CUSTOMER") else ("WEBHOOK_URL" if os.getenv("WEBHOOK_URL") else "none"),
         "lengths": {"customer": l(os.getenv("WEBHOOK_CUSTOMER")), "url": l(os.getenv("WEBHOOK_URL"))}
     }
+    
+@app.get("/_debug/stripe")
+def debug_stripe():
+    try:
+        stripe.Price.list(limit=1)
+        return {"ok": True}
+    except Exception as e:
+        return {"ok": False, "error": str(e)[:200]}
+
 
 def _first_nonempty(*vals):
     for v in vals:
