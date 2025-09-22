@@ -1,4 +1,4 @@
-import os, json, logging
+import os, json, logging, requests
 from typing import Dict, Any
 from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException
@@ -36,18 +36,35 @@ SEEN_EVENTS = set()
 def health():
     return {"ok": True, "service": "Stripe Digital Delivery"}
 
-from notifier import send_fulfillment_card
-import os
-
 @app.get("/_debug/discord/env")
 def debug_env():
-    def l(s): return len(s) if s else 0
+    def L(s): return len(s) if s else 0
     return {
         "WEBHOOK_CUSTOMER_set": bool(os.getenv("WEBHOOK_CUSTOMER")),
         "WEBHOOK_URL_set": bool(os.getenv("WEBHOOK_URL")),
         "chosen": "WEBHOOK_CUSTOMER" if os.getenv("WEBHOOK_CUSTOMER") else ("WEBHOOK_URL" if os.getenv("WEBHOOK_URL") else "none"),
-        "lengths": {"customer": l(os.getenv("WEBHOOK_CUSTOMER")), "url": l(os.getenv("WEBHOOK_URL"))}
+        "lengths": {"customer": L(os.getenv("WEBHOOK_CUSTOMER")), "url": L(os.getenv("WEBHOOK_URL"))},
     }
+
+@app.get("/_debug/discord")  # sends a real test card via your notifier
+def debug_discord():
+    ok = send_fulfillment_card(
+        customer_email="test@example.com",
+        deliverables=[{"name":"Test Pack","direct_link":"https://example.com"}],
+        order_id="debug",
+        mode="customer",
+    )
+    log.info("DEBUG notifier sent=%s", ok)
+    return {"notifier_ok": ok}
+
+# optional: raw POST ping straight to the webhook URL in case the notifier is the issue
+@app.get("/_debug/discord/ping")
+def debug_discord_ping():
+    url = os.getenv("WEBHOOK_CUSTOMER") or os.getenv("WEBHOOK_URL")
+    if not url: return {"ok": False, "error": "no webhook env set"}
+    r = requests.post(url, json={"content": "hello from app (_debug/discord/ping) 🔔"}, timeout=10)
+    log.info("DEBUG direct POST status=%s body=%s", r.status_code, r.text[:120])
+    return {"ok": r.ok, "status": r.status_code}
     
 @app.get("/_debug/stripe")
 def debug_stripe():
