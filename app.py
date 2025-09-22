@@ -105,6 +105,17 @@ def pick_deliverables(product_ids):
             out.append(conf)
     return out
 
+from notifier import send_fulfillment_card
+
+@app.get("/_debug/discord")
+def debug_discord():
+    ok = send_fulfillment_card(
+        customer_email="test@example.com",
+        deliverables=[{"name": "Test Pack", "direct_link": "https://example.com"}],
+        order_id="debug",
+        mode="customer",
+    )
+    return {"notifier_ok": ok}
 
 
 def format_email_body(customer_email: str, deliverables):
