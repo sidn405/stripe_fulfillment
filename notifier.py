@@ -1,6 +1,7 @@
 # notifier.py
-import os, requests
+import os, requests, logging
 from typing import List, Dict, Optional
+log = logging.getLogger("notifier")
 
 # Try to import your helper. If it explodes or the signature doesn't match,
 # we fall back to raw POST with env-provided webhook URLs.
@@ -10,38 +11,30 @@ except Exception:
     _core_send = None
 
 def _get_webhook_url(kind: str) -> Optional[str]:
-    # prefer new vars; auto-fallback to legacy WEBHOOK_URL
     m = {
         "customer": os.getenv("WEBHOOK_CUSTOMER") or os.getenv("WEBHOOK_URL"),
-        "admin":    os.getenv("WEBHOOK_ADMIN")    or os.getenv("WEBHOOK_URL") or os.getenv("WEBHOOK_CUSTOMER"),
-        "system":   os.getenv("WEBHOOK_SYSTEM")   or os.getenv("WEBHOOK_ADMIN")
-                    or os.getenv("WEBHOOK_URL")  or os.getenv("WEBHOOK_CUSTOMER"),
+        "admin":    os.getenv("WEBHOOK_ADMIN") or os.getenv("WEBHOOK_URL") or os.getenv("WEBHOOK_CUSTOMER"),
+        "system":   os.getenv("WEBHOOK_SYSTEM") or os.getenv("WEBHOOK_ADMIN") or os.getenv("WEBHOOK_URL") or os.getenv("WEBHOOK_CUSTOMER"),
     }
     return m.get(kind)
 
 def _post_direct(webhook_url: str, title: str, description: str, fields: List[Dict], color: int) -> bool:
-    import logging
-    log = logging.getLogger("notifier")
     if not webhook_url:
+        log.error("No webhook_url provided")
         return False
-    payload = {"embeds": [{"title": title, "description": description, "fields": fields, "color": color}]}
+    payload = {"content": "", "embeds": [{"title": title, "description": description, "fields": fields, "color": color}]}
     r = requests.post(webhook_url, json=payload, timeout=10)
     if not r.ok:
         log.error("Discord POST failed status=%s body=%s", r.status_code, r.text[:200])
     return r.ok
 
 def _send_any(webhook_type: str, title: str, description: str, fields: List[Dict], color: int) -> bool:
-    # 1) try your helper (most projects expose this signature)
     if _core_send:
         try:
             ok = _core_send(webhook_type=webhook_type, title=title, description=description, fields=fields, color=color)
-            if isinstance(ok, bool):
-                return ok
-        except TypeError:
-            pass
-        except Exception:
-            pass
-    # 2) direct POST fallback
+            if isinstance(ok, bool): return ok
+        except Exception as e:
+            log.warning("Core notifier failed: %s", e)
     return _post_direct(_get_webhook_url(webhook_type), title, description, fields, color)
 
 def send_fulfillment_card(

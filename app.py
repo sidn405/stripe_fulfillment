@@ -243,6 +243,9 @@ async def stripe_webhook(request: Request):
                 first = attachments[0]
                 # Convert the others to links if needed
                 # (Already handled above; keeping implementation simple)
+                log.info("IDs from event: %s", product_ids)
+                log.info("Deliverables matched: %s", [d.get("name") for d in deliverables])
+                
                 ok = send_fulfillment_card(
                     customer_email=customer_email,
                     deliverables=enriched,
