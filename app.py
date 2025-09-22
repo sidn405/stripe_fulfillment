@@ -42,48 +42,56 @@ def _first_nonempty(*vals):
             return v
     return None
 
-def extract_product_ids(event: Dict[str, Any]):
-    """
-    Return a list of price/product IDs from the checkout session or line items.
-    Works for Checkout and PaymentIntent events.
-    """
+def notify_admin_unmapped(event, product_ids, customer_email):
+    try:
+        fields = [
+            {"name": "Customer", "value": customer_email or "(unknown)", "inline": True},
+            {"name": "IDs from event", "value": ", ".join(product_ids) or "(none)", "inline": False},
+            {"name": "Event type", "value": event.get("type",""), "inline": True},
+            {"name": "Event id",   "value": event.get("id",""), "inline": True},
+        ]
+        send_discord_notification(
+            webhook_type="admin",   # uses WEBHOOK_ADMIN; falls back if your helper supports it
+            title="Stripe IDs not mapped",
+            description="Add these IDs to PRODUCTS in products_config.py",
+            fields=fields,
+            color=15158332  # red-ish
+        )
+    except Exception:
+        log.exception("Failed to notify admin of unmapped IDs")
+
+
+def extract_product_ids(event):
     obj = event.get("data", {}).get("object", {})
     product_ids = []
 
-    # Checkout session path
     if obj.get("object") == "checkout.session":
         cs = obj
-        # Expand line items if not present
         if "line_items" not in cs:
             try:
                 cs = stripe.checkout.Session.retrieve(cs["id"], expand=["line_items.data.price.product"])
-            except Exception as e:
+            except Exception:
                 log.exception("Unable to expand line_items")
         for item in cs.get("line_items", {}).get("data", []):
-            price = item.get("price", {})
+            price = item.get("price", {}) or {}
             price_id = price.get("id")
-            product = price.get("product")
             if price_id:
                 product_ids.append(price_id)
-            if product and isinstance(product, dict) and product.get("id"):
-                product_ids.append(product["id"])
 
-    # PaymentIntent (fallback)
-    if obj.get("object") == "payment_intent":
-        pi = obj
-        # If PI originated from Checkout, the session event will be more reliable; keep this as backup
-        if "latest_charge" in pi:
-            pass
-        # You could expand associated invoice/lines here if needed
+            # product can be a dict (expanded) or a string (unexpanded)
+            prod = price.get("product")
+            if isinstance(prod, dict) and prod.get("id"):
+                product_ids.append(prod["id"])
+            elif isinstance(prod, str):
+                product_ids.append(prod)
 
-    # Deduplicate while preserving order
-    seen = set()
-    uniq = []
+    # de-dupe preserving order
+    seen, uniq = set(), []
     for pid in product_ids:
-        if pid not in seen:
-            uniq.append(pid)
-            seen.add(pid)
+        if pid and pid not in seen:
+            uniq.append(pid); seen.add(pid)
     return uniq
+
 
 def pick_deliverables(product_ids):
     """
@@ -96,6 +104,8 @@ def pick_deliverables(product_ids):
         if conf:
             out.append(conf)
     return out
+
+
 
 def format_email_body(customer_email: str, deliverables):
     items_html = []
