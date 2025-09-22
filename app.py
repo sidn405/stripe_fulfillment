@@ -36,6 +36,19 @@ SEEN_EVENTS = set()
 def health():
     return {"ok": True, "service": "Stripe Digital Delivery"}
 
+from notifier import send_fulfillment_card
+import os
+
+@app.get("/_debug/discord/env")
+def debug_env():
+    def l(s): return len(s) if s else 0
+    return {
+        "WEBHOOK_CUSTOMER_set": bool(os.getenv("WEBHOOK_CUSTOMER")),
+        "WEBHOOK_URL_set": bool(os.getenv("WEBHOOK_URL")),
+        "chosen": "WEBHOOK_CUSTOMER" if os.getenv("WEBHOOK_CUSTOMER") else ("WEBHOOK_URL" if os.getenv("WEBHOOK_URL") else "none"),
+        "lengths": {"customer": l(os.getenv("WEBHOOK_CUSTOMER")), "url": l(os.getenv("WEBHOOK_URL"))}
+    }
+
 def _first_nonempty(*vals):
     for v in vals:
         if v:
@@ -104,19 +117,6 @@ def pick_deliverables(product_ids):
         if conf:
             out.append(conf)
     return out
-
-from notifier import send_fulfillment_card
-
-@app.get("/_debug/discord")
-def debug_discord():
-    ok = send_fulfillment_card(
-        customer_email="test@example.com",
-        deliverables=[{"name": "Test Pack", "direct_link": "https://example.com"}],
-        order_id="debug",
-        mode="customer",
-    )
-    return {"notifier_ok": ok}
-
 
 def format_email_body(customer_email: str, deliverables):
     items_html = []
