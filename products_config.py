@@ -19,7 +19,7 @@ PRODUCTS = {
     },
 
     # 500 Fitness Leads ($97)
-    "price_1S9DGzGIMdCB2CY00XQkIPFz": {
+    "price_1S64slGIMdCB2CY0hgYDGcZy": {
         "name": "500 Fitness Leads ($97)",
         "url": "https://drive.google.com/uc?export=download&id=1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S",
     },
