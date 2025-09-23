@@ -105,6 +105,20 @@ def pick_deliverables(product_ids):
             out.append(conf)
     return out
 
+def deduplicate_deliverables(deliverables):
+    """Remove duplicate deliverables based on name and URL"""
+    seen = set()
+    unique_deliverables = []
+    
+    for d in deliverables:
+        # Create a unique key based on name and URL
+        key = (d.get("name", ""), d.get("url", ""))
+        if key not in seen:
+            seen.add(key)
+            unique_deliverables.append(d)
+    
+    return unique_deliverables
+
 @app.post("/stripe/webhook")
 async def stripe_webhook(request: Request):
     payload = await request.body()
@@ -126,11 +140,9 @@ async def stripe_webhook(request: Request):
     event_type = event.get("type")
     log.info(f"▶️ Stripe event: {event_type}")
 
-    # Handle successful checkout
     if event_type in ("checkout.session.completed", "payment_intent.succeeded"):
         obj = event["data"]["object"]
 
-        # Extract customer email
         customer_email = _first_nonempty(
             obj.get("customer_details", {}).get("email"),
             obj.get("receipt_email"),
@@ -142,12 +154,14 @@ async def stripe_webhook(request: Request):
             log.warning("No customer email found; skipping.")
             return JSONResponse({"ok": True, "note": "no customer email"})
 
-        # Extract and map products
         product_ids = extract_product_ids(event)
         deliverables = pick_deliverables(product_ids)
         
+        # 🔥 DEDUPLICATE DELIVERABLES HERE
+        deliverables = deduplicate_deliverables(deliverables)
+        
         log.info("Product IDs found: %s", product_ids)
-        log.info("Deliverables mapped: %s", [d.get("name") for d in deliverables])
+        log.info("Unique deliverables after dedup: %s", [d.get("name") for d in deliverables])
         
         if not deliverables:
             log.warning(f"No configured deliverables for IDs: {product_ids}")
@@ -157,10 +171,9 @@ async def stripe_webhook(request: Request):
         enriched = []
         for d in deliverables:
             name = d.get("name", "Your Download")
-            url = d.get("url")  # Changed from "direct_link" to "url"
+            url = d.get("url")
             
             if url:
-                # Create signed download link
                 link = make_signed_link(APP_BASE_URL, customer_email, name, None, url, ttl_seconds=3600)
                 enriched.append({
                     "name": name,
@@ -180,7 +193,7 @@ async def stripe_webhook(request: Request):
             )
             
             if email_sent:
-                log.info("✅ Email sent successfully to %s", customer_email)
+                log.info("✅ Email sent successfully to %s with %d unique items", customer_email, len(enriched))
                 return JSONResponse({
                     "ok": True, 
                     "email_sent": True,

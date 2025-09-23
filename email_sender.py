@@ -124,7 +124,7 @@ def send_via_mailgun(to_email: str, subject: str, html_content: str) -> bool:
         return False
 
 def create_email_html(customer_email: str, deliverables: List[Dict], order_id: Optional[str]) -> str:
-    """Create beautiful HTML email content"""
+    """Create branded HTML email content matching Lead Generator Empire theme"""
     
     # Build download links
     download_links = []
@@ -134,19 +134,19 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
         if link:
             download_links.append(f'''
             <tr>
-                <td style="padding: 15px; border-bottom: 1px solid #e9ecef;">
+                <td style="padding: 20px; border-bottom: 1px solid #2d3748;">
                     <div style="display: flex; align-items: center;">
-                        <div style="background: #007cba; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold; font-size: 14px;">{i}</div>
-                        <div>
-                            <div style="font-weight: bold; margin-bottom: 5px;">{name}</div>
-                            <a href="{link}" style="background: #007cba; color: white; padding: 8px 16px; text-decoration: none; border-radius: 5px; font-size: 14px; display: inline-block;">Download Now</a>
+                        <div style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: #1a202c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(246, 173, 85, 0.4);">{i}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; margin-bottom: 8px; color: #e2e8f0; font-size: 18px;">{name}</div>
+                            <a href="{link}" style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: #1a202c; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 14px; display: inline-block; font-weight: 600; box-shadow: 0 4px 12px rgba(246, 173, 85, 0.3); transition: all 0.3s ease;">👑 Download Now</a>
                         </div>
                     </div>
                 </td>
             </tr>
             ''')
     
-    downloads_html = "\n".join(download_links) if download_links else '<tr><td style="padding: 15px; text-align: center; color: #6c757d;">No downloads available</td></tr>'
+    downloads_html = "\n".join(download_links) if download_links else '<tr><td style="padding: 20px; text-align: center; color: #a0aec0;">No downloads available</td></tr>'
     
     return f"""
     <!DOCTYPE html>
@@ -154,50 +154,93 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Your Digital Downloads</title>
+        <title>Your Digital Downloads - Lead Generator Empire</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        </style>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa;">
-        <div style="max-width: 600px; margin: 0 auto; background: white;">
-            <!-- Header -->
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🎉 Your Downloads Are Ready!</h1>
-                <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">Thank you for your purchase</p>
+    <body style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; line-height: 1.6; color: #e2e8f0; margin: 0; padding: 0; background-color: #0f1419;">
+        <div style="max-width: 600px; margin: 0 auto; background: #1a202c; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+            
+            <!-- Header with Crown Logo -->
+            <div style="background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); padding: 40px 30px; text-align: center; border-bottom: 3px solid #f6ad55;">
+                <div style="margin-bottom: 20px;">
+                    <!-- Crown Icon -->
+                    <div style="display: inline-block; background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(246, 173, 85, 0.4);">
+                        <span style="font-size: 40px;">👑</span>
+                    </div>
+                </div>
+                <h1 style="color: #f6ad55; margin: 0; font-size: 32px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Your Downloads Are Ready!</h1>
+                <p style="color: #a0aec0; margin: 15px 0 0 0; font-size: 18px; font-weight: 400;">Lead Generator Empire</p>
             </div>
             
             <!-- Content -->
-            <div style="padding: 30px;">
-                <p style="font-size: 18px; margin-bottom: 25px; color: #2c3e50;">Hi there!</p>
+            <div style="padding: 40px 30px; background: #1a202c;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #f6ad55; font-size: 24px; margin: 0 0 10px 0; font-weight: 700;">Hi there!</h2>
+                    <p style="color: #cbd5e0; font-size: 16px; margin: 0; line-height: 1.6;">Thank you for your purchase! Your premium lead packages are ready for download.</p>
+                </div>
                 
-                <p style="margin-bottom: 30px; color: #5a6c7d; line-height: 1.6;">Your digital downloads are ready and waiting for you. Click the download buttons below to get your files:</p>
+                <p style="margin-bottom: 30px; color: #a0aec0; line-height: 1.6; font-size: 16px;">Your digital downloads are ready and waiting for you. Click the download buttons below to get your files:</p>
                 
                 <!-- Downloads Table -->
-                <div style="border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; margin: 25px 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                <div style="border: 2px solid #2d3748; border-radius: 12px; overflow: hidden; margin: 30px 0; background: #2d3748;">
+                    <div style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); padding: 20px; text-align: center;">
+                        <h3 style="margin: 0; color: #1a202c; font-size: 20px; font-weight: 700;">📦 Your Premium Downloads</h3>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; background: #1a202c;">
                         {downloads_html}
                     </table>
                 </div>
                 
                 <!-- Important Notice -->
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 6px; padding: 20px; margin: 25px 0;">
+                <div style="background: linear-gradient(135deg, #742a2a 0%, #9c4221 100%); border: 2px solid #f56565; border-radius: 12px; padding: 25px; margin: 30px 0;">
                     <div style="display: flex; align-items: flex-start;">
-                        <div style="color: #856404; font-size: 20px; margin-right: 10px;">⚠️</div>
+                        <div style="color: #feb2b2; font-size: 24px; margin-right: 15px;">⚠️</div>
                         <div>
-                            <p style="margin: 0; color: #856404; font-weight: 600;">Important Security Notice</p>
-                            <p style="margin: 5px 0 0 0; color: #856404; font-size: 14px;">Download links expire in 1 hour for your security. Please download your files promptly.</p>
+                            <p style="margin: 0 0 8px 0; color: #feb2b2; font-weight: 700; font-size: 18px;">Security Notice</p>
+                            <p style="margin: 0; color: #fed7d7; font-size: 14px; line-height: 1.5;">Download links expire in 1 hour for your security and to prevent unauthorized access. Please download your files promptly.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Empire Stats Box -->
+                <div style="background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); border-radius: 12px; padding: 25px; margin: 30px 0; border: 1px solid #f6ad55;">
+                    <div style="text-align: center;">
+                        <h3 style="color: #f6ad55; margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">🏆 Empire Stats</h3>
+                        <div style="display: flex; justify-content: space-around; text-align: center;">
+                            <div>
+                                <div style="color: #f6ad55; font-size: 24px; font-weight: 700;">8</div>
+                                <div style="color: #a0aec0; font-size: 12px;">Platforms</div>
+                            </div>
+                            <div>
+                                <div style="color: #f6ad55; font-size: 24px; font-weight: 700;">12+</div>
+                                <div style="color: #a0aec0; font-size: 12px;">Languages</div>
+                            </div>
+                            <div>
+                                <div style="color: #f6ad55; font-size: 24px; font-weight: 700;">1M+</div>
+                                <div style="color: #a0aec0; font-size: 12px;">Leads</div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Order Info -->
-                <div style="text-align: center; margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 6px;">
-                    <p style="color: #6c757d; font-size: 14px; margin: 0;">Order ID: <strong>{order_id or 'N/A'}</strong></p>
+                <div style="text-align: center; margin: 30px 0; padding: 20px; background: #2d3748; border-radius: 8px; border-left: 4px solid #f6ad55;">
+                    <p style="color: #a0aec0; font-size: 14px; margin: 0;">Order ID: <span style="color: #f6ad55; font-weight: 600;">{order_id or 'N/A'}</span></p>
                 </div>
             </div>
             
             <!-- Footer -->
-            <div style="background: #2c3e50; color: white; padding: 25px 30px; text-align: center;">
-                <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: 600;">{FROM_NAME}</p>
-                <p style="margin: 0; color: rgba(255,255,255,0.8); font-size: 14px;">Questions? Reply to this email - we're here to help!</p>
+            <div style="background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%); color: #a0aec0; padding: 30px; text-align: center; border-top: 2px solid #f6ad55;">
+                <div style="margin-bottom: 15px;">
+                    <span style="font-size: 24px;">👑</span>
+                </div>
+                <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700; color: #f6ad55;">Lead Generator Empire</p>
+                <p style="margin: 0 0 20px 0; color: #cbd5e0; font-size: 14px;">Generate Quality Leads • 8 Platforms • 12+ Languages</p>
+                <hr style="border: none; border-top: 1px solid #4a5568; margin: 20px 0;">
+                <p style="margin: 0; color: #a0aec0; font-size: 14px;">Questions? Reply to this email - we're here to help!</p>
+                <p style="margin: 10px 0 0 0; color: #718096; font-size: 12px;">Lead Generator Empire | Secure & Private</p>
             </div>
         </div>
     </body>
