@@ -75,6 +75,55 @@ def _first_nonempty(*vals):
             return v
     return None
 
+@app.get("/_debug/test-fulfillment/{price_id}")
+def debug_test_fulfillment(price_id: str):
+    """Test fulfillment for a specific price ID"""
+    
+    # Test product lookup
+    deliverable = PRODUCTS.get(price_id)
+    log.info("=== FULFILLMENT DEBUG ===")
+    log.info("Testing price_id: %s", price_id)
+    log.info("Found deliverable: %s", deliverable)
+    log.info("All PRODUCTS keys: %s", list(PRODUCTS.keys()))
+    
+    if not deliverable:
+        return {
+            "error": "Price ID not found",
+            "price_id": price_id,
+            "available_ids": list(PRODUCTS.keys())
+        }
+    
+    # Test email notification
+    test_email = "debug@test.com"
+    enriched = [{
+        "name": deliverable.get("name", "Test Item"),
+        "direct_link": "https://example.com/test-link",  # Mock link for testing
+    }]
+    
+    log.info("Would send test notification with: %s", enriched)
+    
+    try:
+        ok = send_customer_email(
+            customer_email=test_email,
+            deliverables=enriched,
+            order_id="debug-test"
+        )
+        
+        return {
+            "success": ok,
+            "price_id": price_id,
+            "deliverable": deliverable,
+            "enriched": enriched,
+            "email_sent": ok
+        }
+    except Exception as e:
+        log.exception("Debug fulfillment failed")
+        return {
+            "error": str(e),
+            "price_id": price_id,
+            "deliverable": deliverable
+        }
+
 def extract_product_ids(event) -> list[str]:
     try:
         obj = event.get("data", {}).get("object", {}) if isinstance(event, dict) else {}
