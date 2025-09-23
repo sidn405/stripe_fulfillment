@@ -87,6 +87,56 @@ def debug_stripe():
         return {"ok": True}
     except Exception as e:
         return {"ok": False, "error": str(e)[:200]}
+    
+@app.get("/_debug/test-fulfillment/{price_id}")
+def debug_test_fulfillment(price_id: str):
+    """Test fulfillment for a specific price ID"""
+    
+    # Test product lookup
+    deliverable = PRODUCTS.get(price_id)
+    log.info("=== FULFILLMENT DEBUG ===")
+    log.info("Testing price_id: %s", price_id)
+    log.info("Found deliverable: %s", deliverable)
+    log.info("All PRODUCTS keys: %s", list(PRODUCTS.keys()))
+    
+    if not deliverable:
+        return {
+            "error": "Price ID not found",
+            "price_id": price_id,
+            "available_ids": list(PRODUCTS.keys())
+        }
+    
+    # Test Discord notification
+    test_email = "debug@test.com"
+    enriched = [{
+        "name": deliverable.get("name", "Test Item"),
+        "direct_link": deliverable.get("direct_link") or deliverable.get("url"),  # Check both fields
+    }]
+    
+    log.info("Sending test notification with: %s", enriched)
+    
+    try:
+        ok = send_fulfillment_card(
+            customer_email=test_email,
+            deliverables=enriched,
+            order_id="debug-test",
+            mode="customer"
+        )
+        
+        return {
+            "success": ok,
+            "price_id": price_id,
+            "deliverable": deliverable,
+            "enriched": enriched,
+            "discord_sent": ok
+        }
+    except Exception as e:
+        log.exception("Debug fulfillment failed")
+        return {
+            "error": str(e),
+            "price_id": price_id,
+            "deliverable": deliverable
+        }
 
 
 def _first_nonempty(*vals):
@@ -191,11 +241,17 @@ async def stripe_webhook(request: Request):
     SEEN_EVENTS.add(event_id)
 
     event_type = event.get("type")
-    log.info(f"▶︎ Stripe event: {event_type}")
+    log.info(f"▶️ Stripe event: {event_type}")
 
     # Handle after successful checkout
     if event_type in ("checkout.session.completed", "payment_intent.succeeded"):
         obj = event["data"]["object"]
+        
+        # DEBUG: Log the full object
+        log.info("=== DEBUG: Full event object ===")
+        log.info("Event ID: %s", event_id)
+        log.info("Event type: %s", event_type)
+        log.info("Object keys: %s", list(obj.keys()))
 
         customer_email = _first_nonempty(
             obj.get("customer_details", {}).get("email"),
@@ -203,14 +259,32 @@ async def stripe_webhook(request: Request):
             obj.get("charges", {}).get("data", [{}])[0].get("billing_details", {}).get("email") if obj.get("charges") else None,
             obj.get("customer_email"),
         )
+        
+        # DEBUG: Log email extraction
+        log.info("=== DEBUG: Customer email extraction ===")
+        log.info("customer_details.email: %s", obj.get("customer_details", {}).get("email"))
+        log.info("receipt_email: %s", obj.get("receipt_email"))
+        log.info("customer_email: %s", obj.get("customer_email"))
+        log.info("Final customer_email: %s", customer_email)
+        
         if not customer_email:
             log.warning("No customer email found; skipping.")
             return JSONResponse({"ok": True, "note": "no customer email"})
 
+        # DEBUG: Product ID extraction
+        log.info("=== DEBUG: Product ID extraction ===")
         product_ids = extract_product_ids(event)
+        log.info("Extracted product IDs: %s", product_ids)
+        
         deliverables = pick_deliverables(product_ids)
+        log.info("=== DEBUG: Deliverables mapping ===")
+        log.info("Mapped deliverables: %s", deliverables)
+        log.info("Available PRODUCTS keys: %s", list(PRODUCTS.keys()))
+        
         if not deliverables:
             log.warning(f"No configured deliverables for IDs: {product_ids}")
+            # Send admin notification for unmapped IDs
+            notify_admin_unmapped(event, product_ids, customer_email)
             return JSONResponse({"ok": True, "note": "no deliverables matched"})
 
         # Build email plan: attach small files, generate links for big or remote URLs
@@ -225,60 +299,58 @@ async def stripe_webhook(request: Request):
                 # Never attach; send signed redirect link to this URL
                 link = make_signed_link(APP_BASE_URL, customer_email, name, None, url, ttl_seconds=3600)
                 item["direct_link"] = link
-
             elif path:
                 p = Path(path)
                 if not p.exists():
                     log.error(f"File missing: {p}")
-                    # Fall back to link if you mount files at /static; else skip
                     item["error"] = f"missing file: {p}"
                 else:
                     if p.stat().st_size <= ATTACHMENT_SIZE_LIMIT:
                         item["attach_path"] = str(p)
                     else:
-                        # Too big—issue a signed link to our own download endpoint
                         link = make_signed_link(APP_BASE_URL, customer_email, name, str(p), None, ttl_seconds=3600)
                         item["direct_link"] = link
             enriched.append(item)
 
-        # Compose & send
-        html = format_email_body(customer_email, enriched)
-        # If any item uses attachments, attach the first one only? Or multiple:
-        # We'll attach up to 3 to keep emails light; rest via links.
-        attachments = [i["attach_path"] for i in enriched if "attach_path" in i][:3]
+        # DEBUG: Log enriched deliverables
+        log.info("=== DEBUG: Enriched deliverables ===")
+        log.info("Enriched items: %s", enriched)
+
+        # Send Discord notification
         try:
-            if attachments:
-                # Send one email; if multiple attachments, zip beforehand in future enhancement
-                # Here: attach first file only to avoid provider limits; rest use links
-                first = attachments[0]
-                # Convert the others to links if needed
-                # (Already handled above; keeping implementation simple)
-                log.info("IDs from event: %s", product_ids)
-                log.info("Deliverables matched: %s", [d.get("name") for d in deliverables])
+            log.info("=== DEBUG: Sending Discord notification ===")
+            ok = send_fulfillment_card(
+                customer_email=customer_email,
+                deliverables=enriched,
+                order_id=obj.get("id") or obj.get("payment_intent"),
+                mode="customer"
+            )
+            log.info("Discord fulfillment sent=%s items=%d", ok, len(deliverables))
+            
+            if not ok:
+                log.error("❌ Discord notification failed")
+                # Try sending a simple test message to verify webhook works
+                log.info("Attempting fallback Discord test...")
+                try:
+                    import requests
+                    webhook_url = os.getenv("WEBHOOK_CUSTOMER") or os.getenv("WEBHOOK_URL")
+                    if webhook_url:
+                        test_payload = {
+                            "content": f"🚨 Fulfillment failed for {customer_email} - order {obj.get('id')}"
+                        }
+                        r = requests.post(webhook_url, json=test_payload, timeout=10)
+                        log.info("Fallback message status: %s", r.status_code)
+                except Exception as e:
+                    log.error("Fallback message also failed: %s", e)
+            else:
+                log.info("✅ Discord notification sent successfully")
                 
-                if not deliverables:
-                    from notifier import _send_any
-                    _send_any(
-                        "admin",
-                        title="Stripe IDs not mapped",
-                        description=f"Event {event.get('id')} ({event.get('type')})",
-                        fields=[{"name": "IDs", "value": ", ".join(product_ids) or "(none)", "inline": False}],
-                        color=15158332,
-                    )
-                    return JSONResponse({"ok": True, "note": "no deliverables matched"})
-                
-                ok = send_fulfillment_card(
-                    customer_email=customer_email,
-                    deliverables=enriched,
-                    order_id=obj.get("id") or obj.get("payment_intent"),
-                    mode="customer"   # posts to WEBHOOK_CUSTOMER
-                )
-                log.info("Discord fulfillment sent=%s items=%d", ok, len(deliverables))
-                if not ok:
-                    log.error("Discord notification failed")
         except Exception as e:
-            log.exception("Email sending failed")
-            raise HTTPException(status_code=500, detail=f"Email error: {e}")
+            log.exception("Discord notification failed with exception")
+            raise HTTPException(status_code=500, detail=f"Notification error: {e}")
+
+    else:
+        log.info("Event type %s not handled", event_type)
 
     return JSONResponse({"ok": True})
 

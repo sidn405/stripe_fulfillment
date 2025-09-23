@@ -7,31 +7,32 @@ PRODUCTS = {
     # 5,000 Fitness Leads ($897)  — use the exact Price AND Product IDs
     "price_1S9EZ5QIY3HkFeeoDGjQrPVO": {
         "name": "5,000 Fitness Leads ($897)",
-        "direct_link": "https://drive.google.com/file/d/155XlcLR3taTKY8sekHGCvOFv33HfyrmC/view?usp=drive_link",
+        # Convert Google Drive share link to direct download link
+        "url": "https://drive.google.com/uc?export=download&id=155XlcLR3taTKY8sekHGCvOFv33HfyrmC",
     },
     "prod_T5PNHwQW1riHdR": {
-        "name": "5,000 Fitness Leads ($897)",
-        "direct_link": "https://drive.google.com/file/d/155XlcLR3taTKY8sekHGCvOFv33HfyrmC/view?usp=drive_link",
+        "name": "5,000 Fitness Leads ($897)", 
+        "url": "https://drive.google.com/uc?export=download&id=155XlcLR3taTKY8sekHGCvOFv33HfyrmC",
     },
 
     # 2,000 Fitness Leads ($297)
     "price_1S9Ei2QIY3HkFeeovCq24aWs": {
         "name": "2,000 Fitness Leads ($297)",
-        "direct_link": "https://drive.google.com/file/d/1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR/view?usp=drive_link",
+        "url": "https://drive.google.com/uc?export=download&id=1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR",
     },
     "prod_T5PX9bhtOQwV9c": {
         "name": "2,000 Fitness Leads ($297)",
-        "direct_link": "https://drive.google.com/file/d/1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR/view?usp=drive_link",
+        "url": "https://drive.google.com/uc?export=download&id=1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR",
     },
 
     # 500 Fitness Leads ($97)
     "price_1S9EkBQIY3HkFeeoB0OMwMCc": {
         "name": "500 Fitness Leads ($97)",
-        "direct_link": "https://drive.google.com/file/d/1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S/view?usp=drive_link",
+        "url": "https://drive.google.com/uc?export=download&id=1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S",
     },
     "prod_T5PZa0TLWAxy1Z": {
         "name": "500 Fitness Leads ($97)",
-        "direct_link": "https://drive.google.com/file/d/1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S/view?usp=drive_link",
+        "url": "https://drive.google.com/uc?export=download&id=1v4pYpTrAwlXjT2-G-UnZT6uiJjreRC7S",
     },
 }
 
