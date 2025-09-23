@@ -6,7 +6,7 @@ log = logging.getLogger("notifier")
 # Try to import your helper. If it explodes or the signature doesn't match,
 # we fall back to raw POST with env-provided webhook URLs.
 try:
-    from discord_notification_system import send_discord_notification as _core_send
+    from stripe_fulfillment.email_sender import send_discord_notification as _core_send
 except Exception:
     _core_send = None
 
