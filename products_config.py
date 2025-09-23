@@ -7,13 +7,13 @@ PRODUCTS = {
     # Keep only PRICE IDs (primary identifiers from Stripe Checkout)
     
     # 5,000 Fitness Leads ($897)
-    "price_1S9EZ5QIY3HkFeeoDGjQrPVO": {
+    "price_1S9DBhGIMdCB2CY0CGHsrkdK": {
         "name": "5,000 Fitness Leads ($897)",
         "url": "https://drive.google.com/uc?export=download&id=155XlcLR3taTKY8sekHGCvOFv33HfyrmC",
     },
 
     # 2,000 Fitness Leads ($297)
-    "price_1S9Ei2QIY3HkFeeovCq24aWs": {
+    "price_1S9DDDGIMdCB2CY0KqoWclXb": {
         "name": "2,000 Fitness Leads ($297)",
         "url": "https://drive.google.com/uc?export=download&id=1skfZHzMlMvFb26rbxYwLR3Ho6_VTH3MR",
     },
