@@ -5,11 +5,11 @@
 
 PRODUCTS = {
     # 5,000 Fitness Leads ($897)  — use the exact Price AND Product IDs
-    "price_1S9ESZQIY3HkFeeoDGjGpPVO": {
+    "price_1S9EZ5QIY3HkFeeoDGjQrPVO": {
         "name": "5,000 Fitness Leads ($897)",
         "direct_link": "https://drive.google.com/file/d/155XlcLR3taTKY8sekHGCvOFv33HfyrmC/view?usp=drive_link",
     },
-    "prod_T5PNHwQW1rHdR": {
+    "prod_T5PNHwQW1riHdR": {
         "name": "5,000 Fitness Leads ($897)",
         "direct_link": "https://drive.google.com/file/d/155XlcLR3taTKY8sekHGCvOFv33HfyrmC/view?usp=drive_link",
     },

@@ -57,6 +57,20 @@ def debug_discord():
     log.info("DEBUG notifier sent=%s", ok)
     return {"notifier_ok": ok}
 
+@app.get("/_debug/inspect/{cs_id}")
+def inspect_session(cs_id: str):
+    cs = stripe.checkout.Session.retrieve(
+        cs_id, expand=["line_items.data.price.product"]
+    )
+    items = []
+    for li in cs.get("line_items", {}).get("data", []):
+        p = li.get("price")
+        price_id = p if isinstance(p, str) else (p.get("id") if p else None)
+        prod = (p.get("product") if isinstance(p, dict) else None)
+        product_id = prod if isinstance(prod, str) else (prod.get("id") if isinstance(prod, dict) else None)
+        items.append({"price_id": price_id, "product_id": product_id, "qty": li.get("quantity", 1)})
+    return {"session": cs.get("id"), "items": items}
+
 # optional: raw POST ping straight to the webhook URL in case the notifier is the issue
 @app.get("/_debug/discord/ping")
 def debug_discord_ping():
@@ -100,37 +114,33 @@ def notify_admin_unmapped(event, product_ids, customer_email):
         log.exception("Failed to notify admin of unmapped IDs")
 
 
-def extract_product_ids(event):
-    obj = event.get("data", {}).get("object", {})
-    product_ids = []
-
-    if obj.get("object") == "checkout.session":
-        cs = obj
-        if "line_items" not in cs:
-            try:
-                cs = stripe.checkout.Session.retrieve(cs["id"], expand=["line_items.data.price.product"])
-            except Exception:
-                log.exception("Unable to expand line_items")
-        for item in cs.get("line_items", {}).get("data", []):
-            price = item.get("price", {}) or {}
-            price_id = price.get("id")
-            if price_id:
-                product_ids.append(price_id)
-
-            # product can be a dict (expanded) or a string (unexpanded)
-            prod = price.get("product")
-            if isinstance(prod, dict) and prod.get("id"):
-                product_ids.append(prod["id"])
-            elif isinstance(prod, str):
-                product_ids.append(prod)
-
-    # de-dupe preserving order
-    seen, uniq = set(), []
-    for pid in product_ids:
-        if pid and pid not in seen:
-            uniq.append(pid); seen.add(pid)
-    return uniq
-
+def extract_product_ids(event) -> list[str]:
+    try:
+        obj = event.get("data", {}).get("object", {}) if isinstance(event, dict) else {}
+        cs_id = obj.get("id")
+        if not cs_id:
+            return []
+        cs = stripe.checkout.Session.retrieve(
+            cs_id, expand=["line_items.data.price.product"]
+        )
+        ids = []
+        for li in cs.get("line_items", {}).get("data", []):
+            price = li.get("price")
+            # price can be a string id OR an object
+            if isinstance(price, str):
+                ids.append(price)
+            elif isinstance(price, dict):
+                if price.get("id"):
+                    ids.append(price["id"])
+                prod = price.get("product")
+                if isinstance(prod, str):
+                    ids.append(prod)
+                elif isinstance(prod, dict) and prod.get("id"):
+                    ids.append(prod["id"])
+        return list({i for i in ids if i})  # unique, non-empty
+    except Exception as e:
+        log.exception("Unable to expand line_items: %s", e)
+        return []
 
 def pick_deliverables(product_ids):
     """
@@ -245,6 +255,17 @@ async def stripe_webhook(request: Request):
                 # (Already handled above; keeping implementation simple)
                 log.info("IDs from event: %s", product_ids)
                 log.info("Deliverables matched: %s", [d.get("name") for d in deliverables])
+                
+                if not deliverables:
+                    from notifier import _send_any
+                    _send_any(
+                        "admin",
+                        title="Stripe IDs not mapped",
+                        description=f"Event {event.get('id')} ({event.get('type')})",
+                        fields=[{"name": "IDs", "value": ", ".join(product_ids) or "(none)", "inline": False}],
+                        color=15158332,
+                    )
+                    return JSONResponse({"ok": True, "note": "no deliverables matched"})
                 
                 ok = send_fulfillment_card(
                     customer_email=customer_email,
