@@ -1,5 +1,5 @@
-# Simplified app.py webhook handler - REMOVE Discord imports and functions
-
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 import os, json, logging, requests
 from typing import Dict, Any
 from pathlib import Path
@@ -25,6 +25,12 @@ log = logging.getLogger("stripe-fulfillment")
 
 app = FastAPI(title="Stripe Digital Delivery")
 
+# Create static directory if it doesn't exist
+static_dir = Path("static")
+static_dir.mkdir(exist_ok=True)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 # Simple in-memory idempotency (replace with Redis/DB in prod)
 SEEN_EVENTS = set()
 

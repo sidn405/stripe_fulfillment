@@ -165,8 +165,10 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
             <!-- Header with Crown Logo -->
             <div style="background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); padding: 40px 30px; text-align: center; border-bottom: 3px solid #f6ad55;">
                 <div style="margin-bottom: 20px;">
-                    <!-- Crown Icon -->
-                    <div style="display: inline-block; background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(246, 173, 85, 0.4);">
+                    <!-- Logo from Railway static files -->
+                    <img src="https://stripefulfillment-production.up.railway.app/static/logo.png" alt="Lead Generator Empire Logo" style="max-height: 80px; max-width: 200px; height: auto; margin-bottom: 15px;" />
+                    <!-- Fallback Crown if logo doesn't load -->
+                    <div style="display: none; background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); width: 80px; height: 80px; border-radius: 50%; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(246, 173, 85, 0.4);">
                         <span style="font-size: 40px;">👑</span>
                     </div>
                 </div>
@@ -234,7 +236,7 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
             <!-- Footer -->
             <div style="background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%); color: #a0aec0; padding: 30px; text-align: center; border-top: 2px solid #f6ad55;">
                 <div style="margin-bottom: 15px;">
-                    <span style="font-size: 24px;">👑</span>
+                    <img src="https://stripefulfillment-production.up.railway.app/static/logo.png" alt="Lead Generator Empire" style="max-height: 40px; max-width: 150px; height: auto;" />
                 </div>
                 <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700; color: #f6ad55;">Lead Generator Empire</p>
                 <p style="margin: 0 0 20px 0; color: #cbd5e0; font-size: 14px;">Generate Quality Leads • 8 Platforms • 12+ Languages</p>
