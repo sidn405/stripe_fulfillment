@@ -136,10 +136,10 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
             <tr>
                 <td style="padding: 20px; border-bottom: 1px solid #2d3748;">
                     <div style="display: flex; align-items: center;">
-                        <div style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: #1a202c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(246, 173, 85, 0.4);">{i}</div>
+                        <div style="background: linear-gradient(135deg, #BF9940 0%, #ed8936 100%); color: #1a202c; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(246, 173, 85, 0.4);">{i}</div>
                         <div style="flex: 1;">
                             <div style="font-weight: 700; margin-bottom: 8px; color: #e2e8f0; font-size: 18px;">{name}</div>
-                            <a href="{link}" style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: #1a202c; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 14px; display: inline-block; font-weight: 600; box-shadow: 0 4px 12px rgba(246, 173, 85, 0.3); transition: all 0.3s ease;">👑 Download Now</a>
+                            <a href="{link}" style="background: linear-gradient(135deg, #BF9940 0%, #ed8936 100%); color: #1a202c; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-size: 14px; display: inline-block; font-weight: 600; box-shadow: 0 4px 12px rgba(246, 173, 85, 0.3); transition: all 0.3s ease;">👑 Download Now</a>
                         </div>
                     </div>
                 </td>
@@ -163,23 +163,23 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
         <div style="max-width: 600px; margin: 0 auto; background: #1a202c; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
             
             <!-- Header with Crown Logo -->
-            <div style="background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); padding: 40px 30px; text-align: center; border-bottom: 3px solid #f6ad55;">
+            <div style="background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%); padding: 40px 30px; text-align: center; border-bottom: 3px solid #BF9940;">
                 <div style="margin-bottom: 20px;">
                     <!-- Logo from Railway static files -->
                     <img src="https://stripefulfillment-production.up.railway.app/static/logo.png" alt="Lead Generator Empire Logo" style="max-height: 80px; max-width: 200px; height: auto; margin-bottom: 15px;" />
                     <!-- Fallback Crown if logo doesn't load -->
-                    <div style="display: none; background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); width: 80px; height: 80px; border-radius: 50%; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(246, 173, 85, 0.4);">
+                    <div style="display: none; background: linear-gradient(135deg, #BF9940 0%, #ed8936 100%); width: 80px; height: 80px; border-radius: 50%; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 8px 24px rgba(246, 173, 85, 0.4);">
                         <span style="font-size: 40px;">👑</span>
                     </div>
                 </div>
-                <h1 style="color: #f6ad55; margin: 0; font-size: 32px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Your Downloads Are Ready!</h1>
+                <h1 style="color: #BF9940; margin: 0; font-size: 32px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">Your Downloads Are Ready!</h1>
                 <p style="color: #a0aec0; margin: 15px 0 0 0; font-size: 18px; font-weight: 400;">Lead Generator Empire</p>
             </div>
             
             <!-- Content -->
             <div style="padding: 40px 30px; background: #1a202c;">
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <h2 style="color: #f6ad55; font-size: 24px; margin: 0 0 10px 0; font-weight: 700;">Hi there!</h2>
+                    <h2 style="color: #BF9940; font-size: 24px; margin: 0 0 10px 0; font-weight: 700;">Hi there!</h2>
                     <p style="color: #cbd5e0; font-size: 16px; margin: 0; line-height: 1.6;">Thank you for your purchase! Your premium lead packages are ready for download.</p>
                 </div>
                 
@@ -187,7 +187,7 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
                 
                 <!-- Downloads Table -->
                 <div style="border: 2px solid #2d3748; border-radius: 12px; overflow: hidden; margin: 30px 0; background: #2d3748;">
-                    <div style="background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); padding: 20px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #BF9940 0%, #ed8936 100%); padding: 20px; text-align: center;">
                         <h3 style="margin: 0; color: #1a202c; font-size: 20px; font-weight: 700;">📦 Your Premium Downloads</h3>
                     </div>
                     <table style="width: 100%; border-collapse: collapse; background: #1a202c;">
@@ -207,20 +207,20 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
                 </div>
                 
                 <!-- Empire Stats Box -->
-                <div style="background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); border-radius: 12px; padding: 25px; margin: 30px 0; border: 1px solid #f6ad55;">
+                <div style="background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%); border-radius: 12px; padding: 25px; margin: 30px 0; border: 1px solid #BF9940;">
                     <div style="text-align: center;">
-                        <h3 style="color: #f6ad55; margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">🏆 Empire Stats</h3>
+                        <h3 style="color: #BF9940; margin: 0 0 15px 0; font-size: 18px; font-weight: 700;">🏆 Empire Stats</h3>
                         <div style="display: flex; justify-content: space-around; text-align: center;">
                             <div>
-                                <div style="color: #f6ad55; font-size: 24px; font-weight: 700;">8</div>
+                                <div style="color: #BF9940; font-size: 24px; font-weight: 700;">8</div>
                                 <div style="color: #a0aec0; font-size: 12px;">Platforms</div>
                             </div>
                             <div>
-                                <div style="color: #f6ad55; font-size: 24px; font-weight: 700;">12+</div>
+                                <div style="color: #BF9940; font-size: 24px; font-weight: 700;">12+</div>
                                 <div style="color: #a0aec0; font-size: 12px;">Languages</div>
                             </div>
                             <div>
-                                <div style="color: #f6ad55; font-size: 24px; font-weight: 700;">1M+</div>
+                                <div style="color: #BF9940; font-size: 24px; font-weight: 700;">1M+</div>
                                 <div style="color: #a0aec0; font-size: 12px;">Leads</div>
                             </div>
                         </div>
@@ -228,17 +228,17 @@ def create_email_html(customer_email: str, deliverables: List[Dict], order_id: O
                 </div>
                 
                 <!-- Order Info -->
-                <div style="text-align: center; margin: 30px 0; padding: 20px; background: #2d3748; border-radius: 8px; border-left: 4px solid #f6ad55;">
-                    <p style="color: #a0aec0; font-size: 14px; margin: 0;">Order ID: <span style="color: #f6ad55; font-weight: 600;">{order_id or 'N/A'}</span></p>
+                <div style="text-align: center; margin: 30px 0; padding: 20px; background: #2d3748; border-radius: 8px; border-left: 4px solid #BF9940;">
+                    <p style="color: #a0aec0; font-size: 14px; margin: 0;">Order ID: <span style="color: #BF9940; font-weight: 600;">{order_id or 'N/A'}</span></p>
                 </div>
             </div>
             
             <!-- Footer -->
-            <div style="background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%); color: #a0aec0; padding: 30px; text-align: center; border-top: 2px solid #f6ad55;">
+            <div style="background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%); color: #a0aec0; padding: 30px; text-align: center; border-top: 2px solid #BF9940;">
                 <div style="margin-bottom: 15px;">
                     <img src="https://stripefulfillment-production.up.railway.app/static/logo.png" alt="Lead Generator Empire" style="max-height: 40px; max-width: 150px; height: auto;" />
                 </div>
-                <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700; color: #f6ad55;">Lead Generator Empire</p>
+                <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: 700; color: #BF9940;">Lead Generator Empire</p>
                 <p style="margin: 0 0 20px 0; color: #cbd5e0; font-size: 14px;">Generate Quality Leads • 8 Platforms • 12+ Languages</p>
                 <hr style="border: none; border-top: 1px solid #4a5568; margin: 20px 0;">
                 <p style="margin: 0; color: #a0aec0; font-size: 14px;">Questions? Reply to this email - we're here to help!</p>
